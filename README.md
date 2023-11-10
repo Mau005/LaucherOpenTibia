@@ -1,4 +1,4 @@
-# LaucherOpenTibia
+![1](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/e551cc00-1d5c-421a-9732-8244838ff3df)# LaucherOpenTibia
 The project is designed to load the client without having to enter the folders, the idea of this project is to make an updater to have control for the people who use it
 
 
@@ -13,11 +13,12 @@ https://github.com/Mau005/LaucherOpenTibia/releases
 
 ## Manual Configuración
 
-<a href="https://ibb.co/JkXMtPR"><img src="https://i.ibb.co/mzQMT7C/1.png" alt="1" border="0" /></a>
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/z8BzwgC/2.png" alt="2" border="0" /></a>
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/bFq6N0w/3.png" alt="3" border="0" /></a>
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/S7qHb3W/4.png" alt="4" border="0" /></a>
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/rbBff05/5.png" alt="5" border="0" /></a>
+![1](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/c75f3217-1f0e-4f5f-8224-094b6ade5aa8)
+![2](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/a2077388-08ba-4459-9060-ec81b76f2928)
+![3](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/cdb5181d-7107-40f1-89a3-bf6547e0e5a9)
+![4](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/ca9585bd-3ffb-49f5-99c2-0eff99d8bcf6)
+![5](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/ba35ead1-6503-4a51-b678-cd360e2de15f)
+
 
 
 # This project is being streamed in development on
