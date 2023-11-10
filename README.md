@@ -24,3 +24,8 @@ https://github.com/Mau005/LaucherOpenTibia/releases
 # This project is being streamed in development on
 - https://www.youtube.com/maugame
 - https://www.twitch.tv/kraynodev
+
+## Donate
+If you enjoy the project and like the work that has been done, feel free to donate. Donations are not necessary, but anything is appreciated. Thank you!
+
+Paypal: https://paypal.me/Mau2?country.x=CL&locale.x=es_XC 
