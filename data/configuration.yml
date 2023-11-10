@@ -1,0 +1,7 @@
+Configuration:
+  TitleWindow: OtServer 
+  NameApp: OtServer Welcome
+  Version: 1.0.0
+  PathCLient: ./Client/bin/client.exe
+  PathLogo: logo.jpeg
+  NameButton: Ingresar
