@@ -1,4 +1,4 @@
-![1](https://github.com/Mau005/LaucherOpenTibia/assets/31163804/e551cc00-1d5c-421a-9732-8244838ff3df)# LaucherOpenTibia
+# LaucherOpenTibia
 The project is designed to load the client without having to enter the folders, the idea of this project is to make an updater to have control for the people who use it
 
 
