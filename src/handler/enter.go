@@ -5,8 +5,8 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	conf "github.com/Mau005/LaucherOpenTibia/configuration"
-	"github.com/Mau005/LaucherOpenTibia/controller"
+	"github.com/Mau005/LaucherOpenTibia/src/configuration"
+	"github.com/Mau005/LaucherOpenTibia/src/controller"
 )
 
 type ViewEnterHandler struct{}
@@ -14,11 +14,11 @@ type ViewEnterHandler struct{}
 func (veh *ViewEnterHandler) CreateView() *fyne.Container {
 
 	api := controller.ApiController{}
-	image := canvas.NewImageFromFile(conf.API.PathLogo)
+	image := canvas.NewImageFromFile(configuration.API.PathLogo)
 	image.SetMinSize(fyne.NewSize(0, 450))
-	card := widget.NewCard(conf.API.NameApp, conf.API.Version, image)
+	card := widget.NewCard(configuration.API.NameApp, configuration.API.Version, image)
 
-	button := widget.NewButton(conf.API.NameButton, api.RunClient)
+	button := widget.NewButton(configuration.API.NameButton, api.RunClient)
 
 	return container.NewPadded(container.NewVBox(card, button))
 

@@ -3,14 +3,14 @@ package controller
 import (
 	"os/exec"
 
-	conf "github.com/Mau005/LaucherOpenTibia/configuration"
+	"github.com/Mau005/LaucherOpenTibia/src/configuration"
 )
 
 type ApiController struct{}
 
 func (ap *ApiController) RunClient() {
 
-	cmd := exec.Command(conf.API.PathCLient)
+	cmd := exec.Command(configuration.API.PathCLient)
 	_, err := cmd.Output()
 
 	if err != nil {
