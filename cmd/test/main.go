@@ -1,55 +1,76 @@
 package main
 
 import (
+	"fmt"
+	"image/color"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"github.com/Mau005/LaucherOpenTibia/src/controller"
 )
 
-func main() {
-	a := app.NewWithID("com.ainhoot.mu.theme")
-	a.Settings().SetTheme(controller.NewMUTheme())
+type transparentEntryTheme struct {
+	base fyne.Theme
+}
 
-	w := a.NewWindow("AinhoOT Launcher — Theme Demo")
-	w.Resize(fyne.NewSize(1000, 640))
+func (t transparentEntryTheme) Color(n fyne.ThemeColorName, v fyne.ThemeVariant) color.Color {
+	if n == theme.ColorNameInputBackground {
+		return color.NRGBA{0, 0, 0, 160}
+	}
+	return t.base.Color(n, v)
+}
 
-	// Header “WELCOME” estilo crema/dorado
-	title := widget.NewLabel("WELCOME TO  AinhoOT")
-	title.Alignment = fyne.TextAlignCenter
-	title.TextStyle = fyne.TextStyle{Bold: true}
+func (t transparentEntryTheme) Icon(n fyne.ThemeIconName) fyne.Resource { return t.base.Icon(n) }
+func (t transparentEntryTheme) Font(s fyne.TextStyle) fyne.Resource     { return t.base.Font(s) }
+func (t transparentEntryTheme) Size(n fyne.ThemeSizeName) float32       { return t.base.Size(n) }
 
-	// Simulamos panel central tipo “card”
-	patch := widget.NewMultiLineEntry()
-	patch.SetText("Patch Notes / News\n- Title of patch version 2  (00.02.00)\n- Title of patch          (00.01.00)")
-	patch.Disable()
+func LaucherUI(containerInternal *fyne.Container) *fyne.Container {
+	wallpaper := canvas.NewImageFromFile("./assets/wallpaper2.png")
+	wallpaper.FillMode = canvas.ImageFillStretch
+	cont := container.New(layout.NewStackLayout(), wallpaper, containerInternal)
 
-	server := widget.NewLabel("Server: Offline")
-	progress := widget.NewProgressBar()
+	return cont
+}
 
-	btnWebsite := widget.NewButton("WEBSITE", func() {})
-	btnForum := widget.NewButton("FORUM", func() {})
-	btnStart := widget.NewButtonWithIcon("START", nil, func() {})
-	btnStart.Importance = widget.HighImportance // usa color Primario (azul brillante)
-
-	// Layout: columna central con “panel” y botones abajo
-	center := container.NewVBox(
-		title,
-		container.NewVBox(
-			// borde superior “dorado” simulando marco
-			widget.NewSeparator(),
-			patch,
-			widget.NewSeparator(),
-			progress,
-			server,
-		),
-		container.NewHBox(
-			container.NewMax(widget.NewButton("   ", nil)), // separador flexible si lo deseas
-		),
-		container.NewHBox(btnWebsite, btnForum, btnStart),
+func ContentUI() *fyne.Container {
+	loading := widget.NewProgressBarInfinite()
+	containerButton := container.NewHBox(
+		widget.NewButton("Website", nil),
+		widget.NewButton("Forum", nil),
+		widget.NewButton("Start", nil),
 	)
 
-	w.SetContent(container.NewPadded(center))
+	cont := container.NewVBox()
+
+	for i := 0; i < 40; i++ {
+		but := widget.NewButton(fmt.Sprintf("Number: %d", i), nil)
+		cont.Add(but)
+	}
+	border := container.NewBorder(nil, container.NewCenter(containerButton), nil, nil, container.NewBorder(
+		container.NewCenter(widget.NewLabel("Welcome to AinhoOT")),
+		loading,
+		nil,
+		nil,
+		container.NewAdaptiveGrid(2,
+			container.NewVScroll(cont),
+			canvas.NewImageFromFile("./assets/wallpaper.png"),
+		),
+	))
+	return container.NewPadded(border)
+}
+
+func main() {
+	a := app.New()
+	a.Settings().SetTheme(transparentEntryTheme{base: theme.DarkTheme()})
+	w := a.NewWindow("Laucher AinhoOT")
+	w.Resize(fyne.NewSize(800, 600))
+
+	InitLaucher := LaucherUI(ContentUI())
+	w.SetContent(InitLaucher)
 	w.ShowAndRun()
+
 }
