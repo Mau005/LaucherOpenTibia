@@ -29,7 +29,7 @@ func (t transparentEntryTheme) Font(s fyne.TextStyle) fyne.Resource     { return
 func (t transparentEntryTheme) Size(n fyne.ThemeSizeName) float32       { return t.base.Size(n) }
 
 func LaucherUI(containerInternal *fyne.Container) *fyne.Container {
-	wallpaper := canvas.NewImageFromFile("./assets/wallpaper2.png")
+	wallpaper := canvas.NewImageFromFile("./assets/wallpaper.png")
 	wallpaper.FillMode = canvas.ImageFillStretch
 	cont := container.New(layout.NewStackLayout(), wallpaper, containerInternal)
 
@@ -57,7 +57,7 @@ func ContentUI() *fyne.Container {
 		nil,
 		container.NewAdaptiveGrid(2,
 			container.NewVScroll(cont),
-			canvas.NewImageFromFile("./assets/wallpaper.png"),
+			widget.NewMultiLineEntry(),
 		),
 	))
 	return container.NewPadded(border)
@@ -72,5 +72,4 @@ func main() {
 	InitLaucher := LaucherUI(ContentUI())
 	w.SetContent(InitLaucher)
 	w.ShowAndRun()
-
 }
