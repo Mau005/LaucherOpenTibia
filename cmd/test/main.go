@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -29,15 +28,28 @@ func (t transparentEntryTheme) Font(s fyne.TextStyle) fyne.Resource     { return
 func (t transparentEntryTheme) Size(n fyne.ThemeSizeName) float32       { return t.base.Size(n) }
 
 func LaucherUI(containerInternal *fyne.Container) *fyne.Container {
-	wallpaper := canvas.NewImageFromFile("./assets/wallpaper.png")
+	wallpaper := canvas.NewImageFromFile("./assets/background2.png")
 	wallpaper.FillMode = canvas.ImageFillStretch
 	cont := container.New(layout.NewStackLayout(), wallpaper, containerInternal)
 
 	return cont
 }
 
+func NewsShort(iconID uint8, newsNotice string) *fyne.Container {
+	image := canvas.NewImageFromFile("./assets/newsicon_community_small.png")
+	image.FillMode = canvas.ImageFillContain
+	image.SetMinSize(fyne.NewSize(50, 50))
+	entry := widget.NewMultiLineEntry()
+	entry.SetText(newsNotice)
+	entry.Disable()
+	split := container.NewHSplit(image, entry)
+	split.SetOffset(0.15)
+
+	return container.NewPadded(split)
+
+}
+
 func ContentUI() *fyne.Container {
-	loading := widget.NewProgressBarInfinite()
 	containerButton := container.NewHBox(
 		widget.NewButton("Website", nil),
 		widget.NewButton("Forum", nil),
@@ -46,13 +58,13 @@ func ContentUI() *fyne.Container {
 
 	cont := container.NewVBox()
 
-	for i := 0; i < 40; i++ {
-		but := widget.NewButton(fmt.Sprintf("Number: %d", i), nil)
+	for i := 0; i < 30; i++ {
+		but := NewsShort(1, "asdasdasdasdasdasd\nasdasdasdasdasd\nasdasdasdasdasdsasad\nasdasdasdasdasdsasad\nasdasdasdasdasdsasad\nasdasdasdasdasdsasad\nasdasdasdasdasdsasad")
 		cont.Add(but)
 	}
 	border := container.NewBorder(nil, container.NewCenter(containerButton), nil, nil, container.NewBorder(
 		container.NewCenter(widget.NewLabel("Welcome to AinhoOT")),
-		loading,
+		container.NewVBox(widget.NewProgressBarInfinite(), widget.NewProgressBarInfinite()),
 		nil,
 		nil,
 		container.NewAdaptiveGrid(2,
