@@ -1,0 +1,20 @@
+{
+  "name": "Ainho Launcher",
+  "outputfilename": "ainho-launcher",
+  "frontend": {
+    "dir": "frontend",
+    "install": "npm install",
+    "build": "npm run build",
+    "devServerURL": ""
+  },
+  "author": {
+    "name": "AinhoSoft",
+    "email": ""
+  },
+  "info": {
+    "companyName": "AinhoSoft SPA",
+    "productName": "Ainho Launcher",
+    "productVersion": "1.0.0"
+  },
+  "wailsjsdir": "frontend/src/wailsjs"
+}

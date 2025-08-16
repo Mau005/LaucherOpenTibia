@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Ventana/Titlebar custom --- */
+.drag    { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }
+
+.titlebar { @apply bg-black/40 border-b border-white/10 rounded-t-2xl; }
+.tb-btn   { @apply w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 grid place-items-center; }
+.tb-close { @apply text-red-300 hover:text-red-200; }
+
+/* --- Global --- */
+:root { --gold: #d4af37; }
+
+html, body, #root { height:100%; overflow:hidden; background:transparent !important; }
+
+.skin-panel{
+  @apply relative rounded-2xl backdrop-blur-sm border border-white/10;
+  background: rgba(16,16,20,0.85); /* NO transparente */
+}
+
+/* cajas internas (como en tu 2ª imagen) */
+.subpanel{
+  @apply rounded-2xl border border-white/10;
+  background: rgba(255,255,255,0.06);
+}
+
+::-webkit-scrollbar { display: none; }
+.noselect { user-select: none; }
+/* Header fino dentro del panel */
+.skin-header {
+  @apply px-4 py-2 rounded-t-2xl border-b border-white/10;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+}
+
+/* Botón START estilo gema/bisel */
+.start-btn {
+  @apply text-black font-extrabold tracking-wider text-xl px-10 py-3 rounded-2xl;
+  background: var(--gold);
+  box-shadow:
+    0 0 0 2px rgba(0,0,0,0.35) inset,
+    0 10px 30px rgba(212,175,55,0.45);
+  transition: transform .12s ease, filter .12s ease;
+}
+.start-btn:hover { transform: translateY(-1px) scale(1.02); }
+
+/* Barras de progreso */
+.progress {
+  @apply w-full h-3 rounded-full overflow-hidden;
+  background: rgba(255,255,255,0.12);
+}
+.progress > div {
+  @apply h-full;
+  background: var(--gold);
+}
+
+/* Botones laterales */
+.side-btn {
+  @apply w-full flex items-center justify-between px-4 py-2 rounded-xl;
+  background: rgba(255,255,255,0.08);
+  transition: background-color .12s ease;
+}
+.side-btn:hover { background: rgba(255,255,255,0.12); }
+
+.card-title { @apply text-lg font-bold; color: var(--gold); }
