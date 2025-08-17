@@ -1,6 +1,6 @@
 {
   "name": "Ainho Launcher",
-  "outputfilename": "ainho-launcher",
+  "outputfilename": "Ainho_Launcher",
   "frontend": {
     "dir": "frontend",
     "install": "npm install",

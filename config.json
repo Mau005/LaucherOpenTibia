@@ -1,6 +1,3 @@
 {
-    "Link": "127.0.0.1",
-    "TypeHttp": "http",
-    "Port" : 8000,
-    "AvailablePort": false
+    "IPConnect": "http://127.0.0.1:8000"
 }

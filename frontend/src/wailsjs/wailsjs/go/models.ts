@@ -1,5 +1,21 @@
 export namespace main {
 	
+	export class Players {
+	    Online: number;
+	    Max: number;
+	    Peak: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Players(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Online = source["Online"];
+	        this.Max = source["Max"];
+	        this.Peak = source["Peak"];
+	    }
+	}
 	export class ServerInfo {
 	    Uptime: string;
 	    IP: string;
@@ -31,6 +47,7 @@ export namespace main {
 	export class InfoResponse {
 	    Version: string;
 	    ServerInfo: ServerInfo;
+	    Players: Players;
 	
 	    static createFrom(source: any = {}) {
 	        return new InfoResponse(source);
@@ -40,6 +57,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Version = source["Version"];
 	        this.ServerInfo = this.convertValues(source["ServerInfo"], ServerInfo);
+	        this.Players = this.convertValues(source["Players"], Players);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -95,6 +113,7 @@ export namespace main {
 		    return a;
 		}
 	}
+	
 
 }
 

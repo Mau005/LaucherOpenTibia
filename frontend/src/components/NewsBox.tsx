@@ -29,7 +29,7 @@ export default function NewsBox(){
   const [error, setError]   = useState<string | null>(null)
 
   useEffect(() => {
-    const url = 'http://127.0.0.1:8000/get_news_short' // <-- AJUSTA AQUÍ
+    const url = '/get_news_short' // <-- AJUSTA AQUÍ
     window.go.main.App.GetNews(url)
       .then((list: NewsItem[]) => { setItems(list); setError(null) })
       .catch((e: any) => setError(e?.message || String(e)))

@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -59,10 +60,20 @@ type ServerInfo struct {
 	Version    string `json:"Version"`
 	Client     string `json:"Client"`
 }
+type Players struct {
+	Online int `json:"Online"`
+	Max    int `json:"Max"`
+	Peak   int `json:"Peak"`
+}
 
 type InfoResponse struct {
 	Version    string     `json:"Version"`
 	ServerInfo ServerInfo `json:"ServerInfo"`
+	Players    Players    `json:"Players"` // 👈 importante
+}
+
+type Config struct {
+	IPConnect string `json:"IPConnect"`
 }
 
 /* =========================
@@ -111,6 +122,7 @@ func atomicReplace(tmpPath, finalPath string) error {
 
 //go:embed all:frontend/dist
 var assets embed.FS
+var cfg Config
 
 /* =========================
    App
@@ -161,13 +173,20 @@ func (a *App) GetInstallDir() (string, error) {
 ========================= */
 
 func (a *App) httpGET(url string) (*http.Response, error) {
-	//fmt.Println("HTTP GET:", url)
+	req, _ := http.NewRequestWithContext(a.safeCtx(), "GET", fmt.Sprintf("%s%s", cfg.IPConnect, url), nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (a *App) httpGETNotSecuence(url string) (*http.Response, error) {
 	req, _ := http.NewRequestWithContext(a.safeCtx(), "GET", url, nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println(" -> status:", resp.Status)
 	return resp, nil
 }
 
@@ -197,12 +216,10 @@ func (a *App) GetServerInfo(infoURL string) (*InfoResponse, error) {
 
 // puedes ignorar archivos con esta función (opcional)
 func skippable(path string) bool {
-	// Evita .DS_Store u otros que no estén en el CDN
 	return strings.HasPrefix(filepath.Base(path), ".")
 }
 
 func buildFileURL(baseURL, path, override string) string {
-	// override te permite forzar base en local si el manifest apunta a prod (opcional)
 	if strings.HasPrefix(override, "http") {
 		baseURL = override
 	}
@@ -210,8 +227,9 @@ func buildFileURL(baseURL, path, override string) string {
 	path = strings.TrimLeft(path, "/")
 	return baseURL + "/" + path
 }
+
 func (a *App) downloadWithProgress(url, dest string, totalBytes int64, doneSoFar *int64) error {
-	resp, err := a.httpGET(url)
+	resp, err := a.httpGETNotSecuence(url)
 	if err != nil {
 		return err
 	}
@@ -228,7 +246,6 @@ func (a *App) downloadWithProgress(url, dest string, totalBytes int64, doneSoFar
 	if err != nil {
 		return err
 	}
-	// ¡NO uses defer out.Close() aquí!
 
 	buf := make([]byte, 64*1024)
 	var fileDone int64
@@ -347,7 +364,7 @@ func (a *App) UpdateFromManifest(manifestURL, installDir string) error {
 		}
 		dest := filepath.Join(installDir, filepath.FromSlash(f.Path))
 
-		//fmt.Println("Downloading:", url, "->", dest)
+		fmt.Println("Downloading:", url, "->", dest)
 
 		if err := a.downloadWithProgress(url, dest, bytesToDownload, &doneSoFar); err != nil {
 			return err
@@ -405,12 +422,19 @@ func (a *App) OpenLink(url string) error {
 ========================= */
 
 func main() {
+	contet, err := os.ReadFile("config.json")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	json.Unmarshal(contet, &cfg)
+
 	app := NewApp()
 
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:            "Ainho Launcher",
-		Width:            1180,
-		Height:           780,
+		Width:            1200,
+		Height:           800,
 		Frameless:        true,
 		DisableResize:    false,
 		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},

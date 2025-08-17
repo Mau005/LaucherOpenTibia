@@ -45,7 +45,7 @@ export default function App(){
     setTotalP(0); setFileP(0)
 
     try {
-      const manifestURL = 'http://127.0.0.1:8000/client/manifest'
+      const manifestURL = '/client/manifest'
       if (!installDir) throw new Error('Resolviendo carpeta de instalación...')
 
       // 1) chequeo + actualización
