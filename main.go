@@ -449,7 +449,7 @@ func main() {
 			},
 		},
 		AssetServer: &assetserver.Options{Assets: assets},
-		OnStartup:   app.startup, // <- IMPORTANTE: inicializa a.ctx
+		OnStartup:   app.startup,
 		Bind:        []interface{}{app},
 	})
 

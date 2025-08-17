@@ -34,6 +34,52 @@ cd frontend && npm run build && cd .. && wails dev
 ###Linux/Mac
 ```bash
 cd frontend && npm run build && cd .. && wails dev
+```
 
-## Compile
+<<<<<<< HEAD
+---
 
+## 📦 Compilation
+
+```bash
+wails build
+```
+
+The binary will be generated in the `build/bin` folder.
+
+---
+
+## ⚙️ External Configuration
+
+The launcher can take endpoints and configurations from a Go file that exposes functions such as:
+
+```go
+func (a *App) GetServerInfo(infoURL string) (*InfoResponse, error)
+func (a *App) GetNews(newsURL string) ([]NewsItem, error)
+```
+
+This allows you to unify and modify IP addresses or endpoints from an **external configurator**.
+
+---
+
+## 🌐 Endpoints used
+- `/client/info` → Server information (Uptime, Players, Status).
+- `/get_news_short` → Short news and announcements.
+- `/client/manifest` → Manifest dependency.
+
+---
+
+## 👨‍💻 Credits
+
+Project developed by **Mau005**
+Contributions and improvements are welcome.
+
+## Photo:
+
+<img width="1211" height="815" alt="image" src="https://github.com/user-attachments/assets/cdaaab01-a8ef-477e-8716-38bd83bd48b7" />
+
+---
+
+## 📜 License
+
+MIT License © 2025 AinhoSoft
