@@ -10,6 +10,10 @@ export function GetInstallDir() {
   return window['go']['main']['App']['GetInstallDir']();
 }
 
+export function GetNews(arg1) {
+  return window['go']['main']['App']['GetNews'](arg1);
+}
+
 export function GetServerInfo(arg1) {
   return window['go']['main']['App']['GetServerInfo'](arg1);
 }

@@ -1,1 +1,7 @@
 Client
+
+**/build/bin
+**/build/windows
+**/build/linux
+**/build/mac
+**/frontend/node_modules

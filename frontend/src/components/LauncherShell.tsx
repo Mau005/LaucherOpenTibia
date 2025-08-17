@@ -12,19 +12,22 @@ export default function LauncherShell({ children }: { children: React.ReactNode 
         </div>
 
         {/* MAGO sobresaliendo por fuera del panel */}
+       
+        {/*
         <img
           src={mage}
           alt=""
           className="
             pointer-events-none
             absolute
-            -left-2        /* sale por la izquierda */
-            -top-5         /* súbelo un poco más si quieres: -top-28/-top-32 */
-            h-[35vh]        /* alto grande para que se vea poderoso */
+            -left-2        
+            -top-5        
+            h-[35vh]       
             z-50
             drop-shadow-[0_24px_48px_rgba(0,0,0,0.55)]
           "
         />
+        */}
       </div>
     </div>
   )

@@ -7,7 +7,7 @@ export default function TitleBar(){
       <div className="text-sm opacity-80 select-none">AinhoSoft</div>
       <div className="flex items-center gap-2 no-drag">
         <button className="tb-btn" onClick={()=>R.WindowMinimise()}>—</button>
-        <button className="tb-btn" onClick={()=>R.WindowToggleMaximise()}>▢</button>
+
         <button className="tb-btn tb-close" onClick={()=>R.Quit()}>✕</button>
       </div>
     </div>

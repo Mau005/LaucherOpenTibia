@@ -15,12 +15,11 @@ declare global {
 export default function App(){
   // estado real del updater
   const [status, setStatus]   = useState('Launcher started, have a good game!')
-  const [totalP, setTotalP]   = useState(0)   // Total bytes (0..100)
-  const [fileP, setFileP]     = useState(0)   // Archivo actual (0..100)
+  const [totalP, setTotalP]   = useState(0)
+  const [fileP, setFileP]     = useState(0)
   const [busy, setBusy]       = useState(false)
   const [installDir, setInstallDir] = useState<string>('')
 
-  // suscripción a eventos del backend (NO cambia apariencia)
   useEffect(() => {
     const off1 = window.runtime?.EventsOn?.('update:status', (s:string)=> setStatus(s))
     const off2 = window.runtime?.EventsOn?.('update:totalProgress', (p:number)=> setTotalP(Math.round((p||0)*100)))
@@ -28,7 +27,6 @@ export default function App(){
     return () => { off1?.(); off2?.(); off3?.() }
   }, [])
 
-  // resolver ./Client al lado del ejecutable (no toca la UI)
   useEffect(() => {
     (async () => {
       try {
@@ -47,7 +45,6 @@ export default function App(){
     setTotalP(0); setFileP(0)
 
     try {
-      // usa tu endpoint real del manifest (ajústalo si es distinto)
       const manifestURL = 'http://127.0.0.1:8000/client/manifest'
       if (!installDir) throw new Error('Resolviendo carpeta de instalación...')
 
@@ -57,7 +54,7 @@ export default function App(){
       // 2) lanzar el juego si todo OK
       setStatus('Launching game...')
       // ajusta al ejecutable real dentro de ./Client
-      await window.go.main.App.StartGame('./Client/bin/AinhoTest.exe')
+      await window.go.main.App.StartGame('./Client/bin/Ainho.exe')
 
       setStatus('Game launched!')
     } catch (e:any) {

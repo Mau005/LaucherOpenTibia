@@ -6,6 +6,8 @@ export function CheckUpdates():Promise<Array<string>>;
 
 export function GetInstallDir():Promise<string>;
 
+export function GetNews(arg1:string):Promise<Array<main.NewsShort>>;
+
 export function GetServerInfo(arg1:string):Promise<main.InfoResponse>;
 
 export function OpenLink(arg1:string):Promise<void>;

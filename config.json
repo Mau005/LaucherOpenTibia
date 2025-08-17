@@ -1,0 +1,6 @@
+{
+    "Link": "127.0.0.1",
+    "TypeHttp": "http",
+    "Port" : 8000,
+    "AvailablePort": false
+}

@@ -33,7 +33,14 @@ type FileEntry struct {
 	SHA256 string `json:"sha256"`
 	URL    string `json:"url,omitempty"`
 }
-
+type NewsShort struct {
+	CreatedAt   time.Time
+	IconID      uint8  `json:"IconID"`
+	Description string `json:"Description"`
+}
+type NewsResponse struct {
+	NewsShort []NewsShort `json:"NewsShort"` // ojo: tu payload dice "NewsSort"
+}
 type Manifest struct {
 	App     string      `json:"app"`
 	Version string      `json:"version"`
@@ -78,8 +85,24 @@ func sha256File(path string) (int64, string, error) {
 
 func ensureDir(p string) error { return os.MkdirAll(filepath.Dir(p), 0755) }
 
+// Reemplaza tu atomicReplace por esta versión con reintentos (Windows-friendly)
 func atomicReplace(tmpPath, finalPath string) error {
-	return os.Rename(tmpPath, finalPath)
+	const attempts = 10
+	for i := 0; i < attempts; i++ {
+		// Si existe el destino, intenta borrarlo (Windows no sobrescribe con Rename)
+		if _, err := os.Stat(finalPath); err == nil {
+			if err := os.Remove(finalPath); err != nil {
+				time.Sleep(200 * time.Millisecond)
+				continue
+			}
+		}
+		if err := os.Rename(tmpPath, finalPath); err != nil {
+			time.Sleep(200 * time.Millisecond)
+			continue
+		}
+		return nil
+	}
+	return fmt.Errorf("failed to replace %s after %d attempts", finalPath, attempts)
 }
 
 /* =========================
@@ -99,17 +122,14 @@ type App struct {
 
 func NewApp() *App { return &App{} }
 
-// Context de Wails: SOLO éste sirve para runtime.Events*
 func (a *App) startup(ctx context.Context) { a.ctx = ctx }
 
-// Emit seguro (solo si ctx está listo)
 func (a *App) emit(event string, data any) {
 	if a.ctx != nil {
 		wruntime.EventsEmit(a.ctx, event, data)
 	}
 }
 
-// Contexto seguro para HTTP (NO usar para runtime)
 func (a *App) safeCtx() context.Context {
 	if a != nil && a.ctx != nil {
 		return a.ctx
@@ -141,13 +161,13 @@ func (a *App) GetInstallDir() (string, error) {
 ========================= */
 
 func (a *App) httpGET(url string) (*http.Response, error) {
-	fmt.Println("HTTP GET:", url)
+	//fmt.Println("HTTP GET:", url)
 	req, _ := http.NewRequestWithContext(a.safeCtx(), "GET", url, nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(" -> status:", resp.Status)
+	//fmt.Println(" -> status:", resp.Status)
 	return resp, nil
 }
 
@@ -190,7 +210,6 @@ func buildFileURL(baseURL, path, override string) string {
 	path = strings.TrimLeft(path, "/")
 	return baseURL + "/" + path
 }
-
 func (a *App) downloadWithProgress(url, dest string, totalBytes int64, doneSoFar *int64) error {
 	resp, err := a.httpGET(url)
 	if err != nil {
@@ -209,16 +228,17 @@ func (a *App) downloadWithProgress(url, dest string, totalBytes int64, doneSoFar
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	// ¡NO uses defer out.Close() aquí!
 
 	buf := make([]byte, 64*1024)
 	var fileDone int64
-	cl := resp.ContentLength // puede ser -1
+	cl := resp.ContentLength
 
 	for {
 		n, rerr := resp.Body.Read(buf)
 		if n > 0 {
 			if _, werr := out.Write(buf[:n]); werr != nil {
+				out.Close()
 				return werr
 			}
 			fileDone += int64(n)
@@ -236,14 +256,40 @@ func (a *App) downloadWithProgress(url, dest string, totalBytes int64, doneSoFar
 			break
 		}
 		if rerr != nil {
+			out.Close()
 			return rerr
 		}
 	}
+
+	if err := out.Sync(); err != nil {
+		out.Close()
+		return err
+	}
+	if err := out.Close(); err != nil {
+		return err
+	}
+
 	return atomicReplace(tmp, dest)
 }
 
+// ==== método expuesto a frontend ====
+func (a *App) GetNews(apiURL string) ([]NewsShort, error) {
+	resp, err := a.httpGET(apiURL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("http %d", resp.StatusCode)
+	}
+	var payload NewsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
+		return nil, err
+	}
+	return payload.NewsShort, nil
+}
+
 func (a *App) UpdateFromManifest(manifestURL, installDir string) error {
-	// 1) Manifest
 	resp, err := a.httpGET(manifestURL)
 	if err != nil {
 		return err
@@ -258,16 +304,13 @@ func (a *App) UpdateFromManifest(manifestURL, installDir string) error {
 	}
 	fmt.Println("Manifest OK. base_url:", man.BaseURL)
 
-	// (Opcional) para pruebas locales: forzar base_url a tu server local
-	// overrideBase := "http://127.0.0.1:8000/client" // TODO: descomenta para pruebas locales
-	overrideBase := "" // en prod, déjalo vacío
+	overrideBase := ""
 
-	// 2) decidir qué bajar
 	var bytesToDownload int64
 	toProcess := make([]FileEntry, 0, len(man.Files))
 
 	for _, f := range man.Files {
-		if skippable(f.Path) { // si quieres saltarte .DS_Store, etc.
+		if skippable(f.Path) {
 			fmt.Println("Skip:", f.Path)
 			continue
 		}
@@ -294,7 +337,6 @@ func (a *App) UpdateFromManifest(manifestURL, installDir string) error {
 		return nil
 	}
 
-	// 3) descargar/verificar
 	var doneSoFar int64
 	for _, f := range toProcess {
 		a.emit("update:status", "Downloading "+f.Path)
@@ -305,7 +347,7 @@ func (a *App) UpdateFromManifest(manifestURL, installDir string) error {
 		}
 		dest := filepath.Join(installDir, filepath.FromSlash(f.Path))
 
-		fmt.Println("Downloading:", url, "->", dest)
+		//fmt.Println("Downloading:", url, "->", dest)
 
 		if err := a.downloadWithProgress(url, dest, bytesToDownload, &doneSoFar); err != nil {
 			return err
@@ -322,10 +364,6 @@ func (a *App) UpdateFromManifest(manifestURL, installDir string) error {
 	fmt.Println("Update completed in:", installDir)
 	return nil
 }
-
-/* =========================
-   Demo + utilidades
-========================= */
 
 func (a *App) CheckUpdates() ([]string, error) {
 	steps := []string{"Checking updates...", "Downloading client.bin", "Verifying files...", "Ready to start"}
@@ -374,7 +412,7 @@ func main() {
 		Width:            1180,
 		Height:           780,
 		Frameless:        true,
-		DisableResize:    true,
+		DisableResize:    false,
 		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
 		Mac: &mac.Options{
 			Appearance:           mac.NSAppearanceNameDarkAqua,
