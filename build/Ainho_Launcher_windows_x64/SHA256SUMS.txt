@@ -1,0 +1,2 @@
+﻿5315934bd21f3143daff74cce785fdb207f759e820ee2046acf0a2844133b396  Ainho_Launcher.exe
+bc43517c53393308b7963fa901c51007fd300d05508b63b37b965dc5eb296c7a  Ainho Launcher-amd64-installer.exe

@@ -44,7 +44,33 @@ cd frontend && npm run build && cd .. && wails dev
 ```bash
 wails build
 ```
+## 📦 Compilation NSIS | Certificate
 
+Requeriments
+- Windows SDK
+- NSIS
+
+```bash
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+```bash
+.\build-sign-release.ps1 `
+  -Version "1.0.3" `
+  -BuildArch "windows/amd64" `
+  -AppExeName "Ainho_Launcher.exe" `
+  -PfxPath "your certificate" `
+  -PfxPassword "TU_PASS"
+
+  or
+
+  .\build-sign-release.ps1 -Version "1.0.2" -AppExeName "Ainho_Launcher.exe" -PfxPath "C:\Users\mau\Documents\ainhosoft.pfx" -PfxPassword "TU_PASS"
+  
+```
+Linux
+```
+wails build -clean -platform linux/amd64
+```
 The binary will be generated in the `build/bin` folder.
 
 ---

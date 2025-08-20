@@ -54,7 +54,7 @@ export default function App(){
       // 2) lanzar el juego si todo OK
       setStatus('Launching game...')
       // ajusta al ejecutable real dentro de ./Client
-      await window.go.main.App.StartGame('./Client/bin/Ainho.exe')
+      await window.go.main.App.StartGame()
 
       setStatus('Game launched!')
     } catch (e:any) {

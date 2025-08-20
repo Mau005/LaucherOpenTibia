@@ -13,7 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	stdruntime "runtime"
+	"runtime"
 	"strings"
 	"time"
 
@@ -40,7 +40,7 @@ type NewsShort struct {
 	Description string `json:"Description"`
 }
 type NewsResponse struct {
-	NewsShort []NewsShort `json:"NewsShort"` // ojo: tu payload dice "NewsSort"
+	NewsShort []NewsShort `json:"NewsShort"`
 }
 type Manifest struct {
 	App     string      `json:"app"`
@@ -69,11 +69,12 @@ type Players struct {
 type InfoResponse struct {
 	Version    string     `json:"Version"`
 	ServerInfo ServerInfo `json:"ServerInfo"`
-	Players    Players    `json:"Players"` // 👈 importante
+	Players    Players    `json:"Players"`
 }
 
 type Config struct {
-	IPConnect string `json:"IPConnect"`
+	IPConnect  string `json:"IPConnect"`
+	ClientPath string `json:"ClientPath"`
 }
 
 /* =========================
@@ -149,24 +150,76 @@ func (a *App) safeCtx() context.Context {
 	return context.Background()
 }
 
-/* =========================
-   Rutas locales (./Client)
-========================= */
+/*
+	=========================
+	  Rutas locales (./Client)
+
+=========================
+*/
+func userDataRoot() (string, error) {
+	switch runtime.GOOS {
+	case "windows":
+		// %LOCALAPPDATA%\AinhoSoft\AinhoLauncher
+		if base, ok := os.LookupEnv("LOCALAPPDATA"); ok {
+			return filepath.Join(base, "AinhoSoft", "AinhoLauncher"), nil
+		}
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, "AppData", "Local", "AinhoSoft", "AinhoLauncher"), nil
+	case "darwin":
+		// ~/Library/Application Support/AinhoLauncher
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, "Library", "Application Support", "AinhoLauncher"), nil
+	default:
+		// Linux/otros: ~/.local/share/ainho-launcher
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, ".local", "share", "ainho-launcher"), nil
+	}
+}
 
 func (a *App) GetInstallDir() (string, error) {
-	exe, err := os.Executable()
+	root, err := userDataRoot()
 	if err != nil {
 		return "", err
 	}
-	baseDir := filepath.Dir(exe)
-	clientDir := filepath.Join(baseDir, "Client")
-	if _, err := os.Stat(clientDir); os.IsNotExist(err) {
-		if err := os.MkdirAll(clientDir, 0755); err != nil {
-			return "", err
-		}
+	clientDir := filepath.Join(root, "client")
+	if err := os.MkdirAll(clientDir, 0o755); err != nil {
+		return "", err
 	}
 	return clientDir, nil
 }
+func (a *App) GetGameExecutable() (string, error) {
+	dir, err := a.GetInstallDir()
+	if err != nil {
+		return "", err
+	}
+
+	var exeName string
+	switch runtime.GOOS {
+	case "windows":
+		exeName = fmt.Sprintf("bin/%s.exe", cfg.ClientPath)
+	case "darwin":
+		exeName = fmt.Sprintf("Ainho.app/Contents/MacOS/%s", cfg.ClientPath)
+	default: // Linux
+		exeName = cfg.ClientPath
+	}
+
+	return filepath.Join(dir, exeName), nil
+}
+
+// func (a *App) GetInstallDir() (string, error) {
+// 	exe, err := os.Executable()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	baseDir := filepath.Dir(exe)
+// 	clientDir := filepath.Join(baseDir, "Client")
+// 	if _, err := os.Stat(clientDir); os.IsNotExist(err) {
+// 		if err := os.MkdirAll(clientDir, 0755); err != nil {
+// 			return "", err
+// 		}
+// 	}
+// 	return clientDir, nil
+// }
 
 /* =========================
    HTTP utils
@@ -395,9 +448,14 @@ func (a *App) CheckUpdates() ([]string, error) {
 	return steps, nil
 }
 
-func (a *App) StartGame(path string) (string, error) {
+func (a *App) StartGame() (string, error) {
 	var cmd *exec.Cmd
-	switch stdruntime.GOOS {
+	path, err := a.GetGameExecutable()
+	if err != nil {
+		log.Println(err)
+		return "error execute client", err
+	}
+	switch runtime.GOOS {
 	case "windows", "linux", "darwin":
 		cmd = exec.Command(path)
 	default:
@@ -422,13 +480,18 @@ func (a *App) OpenLink(url string) error {
 ========================= */
 
 func main() {
-	contet, err := os.ReadFile("config.json")
+
+	cont, err := os.ReadFile("config.json")
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
-	json.Unmarshal(contet, &cfg)
-
+	err = json.Unmarshal(cont, &cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// cfg.IPConnect = "https://ainho.ddns.net"
+	// cfg.ClientPath = "Ainho"
 	app := NewApp()
 
 	err = wails.Run(&options.App{

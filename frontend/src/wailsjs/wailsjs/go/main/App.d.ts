@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function CheckUpdates():Promise<Array<string>>;
 
+export function GetGameExecutable():Promise<string>;
+
 export function GetInstallDir():Promise<string>;
 
 export function GetNews(arg1:string):Promise<Array<main.NewsShort>>;
@@ -12,6 +14,6 @@ export function GetServerInfo(arg1:string):Promise<main.InfoResponse>;
 
 export function OpenLink(arg1:string):Promise<void>;
 
-export function StartGame(arg1:string):Promise<string>;
+export function StartGame():Promise<string>;
 
 export function UpdateFromManifest(arg1:string,arg2:string):Promise<void>;

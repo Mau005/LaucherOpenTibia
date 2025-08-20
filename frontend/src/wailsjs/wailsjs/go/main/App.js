@@ -6,6 +6,10 @@ export function CheckUpdates() {
   return window['go']['main']['App']['CheckUpdates']();
 }
 
+export function GetGameExecutable() {
+  return window['go']['main']['App']['GetGameExecutable']();
+}
+
 export function GetInstallDir() {
   return window['go']['main']['App']['GetInstallDir']();
 }
@@ -22,8 +26,8 @@ export function OpenLink(arg1) {
   return window['go']['main']['App']['OpenLink'](arg1);
 }
 
-export function StartGame(arg1) {
-  return window['go']['main']['App']['StartGame'](arg1);
+export function StartGame() {
+  return window['go']['main']['App']['StartGame']();
 }
 
 export function UpdateFromManifest(arg1, arg2) {
